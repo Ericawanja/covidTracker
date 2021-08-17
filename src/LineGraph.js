@@ -1,4 +1,3 @@
-import { blue } from '@material-ui/core/colors';
 import React, {useEffect, useState} from 'react'
 import {Line} from "react-chartjs-2"
 import numeral from 'numeral'
@@ -48,20 +47,20 @@ import numeral from 'numeral'
 
 
 function LineGraph() {
-    const [data, setData]= useState()
+    const [data, setData]= useState({})
 
-    const buildChartData = (data, casesType) => {
+    const buildChartData = (casesData) => {
         const chartData =[];
         let lastDataPoint;
-        for (let date in data.cases){
+        for (let date in casesData){
             if(lastDataPoint){
-                const newDataPoint ={
+                let newDataPoint ={
                     x:date,
-                    y:data[casesType][date]-lastDataPoint
-                }
-                chartData.push(newDataPoint)                    
+                    y:casesData[date]-lastDataPoint,
+                };
+                chartData.push(newDataPoint)
             }
-            lastDataPoint =data[casesType][date]
+            lastDataPoint =casesData[date]
         }
         return chartData
     }
@@ -69,31 +68,35 @@ function LineGraph() {
     useEffect(()=>{
         const fetchData = async ()=>{
             await  fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=120")
-             .then(response =>response.json())
+             .then((response) => {
+                 return response.json()
+                })
               .then(data =>{
-                  console.log(data)
-             let chartData = buildChartData(data,"cases");
-             console.log(chartData)
+                  const rawCases=(data['cases'])
+             let chartData = buildChartData(rawCases);
              setData(chartData)
+             
         })
     }; 
     fetchData()
-    }, [])
+    }, []) 
 
     return (
         <div>
+            {data?.length >0 &&(
             <Line
             options={options1}
             data={{
-                datasets:[
+                datasets: [
                     {
                         data:data,
-                        borderColor:'#CC1034',
-                        backgroundColor:"rgba(204, 16, 52, 0.5)",
+                        borderColor:"rgba(20, 16, 2, 0.5)",
+                        backgroundColor: "rgb(10,290,30)"
                     },
                 ]
             }}
             />
+            )} 
         </div>
     )
 }

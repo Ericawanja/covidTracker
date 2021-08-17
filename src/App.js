@@ -6,6 +6,7 @@ import Table from "./Table"
 import Map from "./Map"
 import sortData from "./util.js"
 import LineGraph from './LineGraph'
+import "leaflet/dist/leaflet.css"
 import {
   MenuItem,
   FormControl,
@@ -19,6 +20,10 @@ function App() {
   const [country, setCountry] =useState(['worldwide'])
   const [countryInfo, setCountryInfo]= useState([])
   const [tableData, setTableData] = useState([])
+  const [mapCenter, setMapCenter]= useState([ 34,  -40])
+  const [mapZoom, setMapZoom]=useState(3)
+  const [mapCountries, setMapCountries]= useState([])
+  const [casesType, setCasesType]= useState("cases")
   
   useEffect(()=>{
     fetch("https://disease.sh/v3/covid-19/all")
@@ -30,13 +35,17 @@ function App() {
   useEffect(() => {
     const getCountriesData = async () => {
       await fetch('https://disease.sh/v3/covid-19/countries')
-      .then(response=> response.json())
+      .then(response => response.json())
+      
       .then((data) => { 
+        const toSetOnMap= data
         const countriesList = data.map((Country) => ({
           name: Country.country,
           value: Country.countryInfo.iso2,
         }));
+        console.log(toSetOnMap)
         const sortedData = sortData(data)
+        setMapCountries(data)
         setTableData(sortedData)
         setCountries(countriesList)
       })
@@ -55,6 +64,8 @@ function App() {
       .then(response => response.json())
       .then(data => {
         setCountryInfo(data)
+        setMapCenter([data.countryInfo.lat, data.countryInfo.long])
+        setMapZoom(5)
       })  
   }; 
   return (
@@ -80,7 +91,11 @@ function App() {
 
         {/*the map*/}
         <div>
-          <Map/>
+          <Map 
+            countries={mapCountries}
+           center={mapCenter}
+           zoom={mapZoom}
+          />
         </div>
 
       </div>
@@ -88,11 +103,9 @@ function App() {
         <CardContent>
           <h3>Live cases by country</h3>
            <Table countries={tableData}/>    
-        </CardContent>
-        <CardContent>
           <h3>Worldwide new cases</h3>
           <LineGraph/>
-        </CardContent>
+        </CardContent>    
       </Card>
     </div>
   );
