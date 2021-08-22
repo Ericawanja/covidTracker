@@ -44,8 +44,9 @@ function App() {
           value: Country.countryInfo.iso2,
         }));
         console.log(toSetOnMap)
+        console.log( data)
+        setMapCountries(toSetOnMap)
         const sortedData = sortData(data)
-        setMapCountries(data)
         setTableData(sortedData)
         setCountries(countriesList)
       })

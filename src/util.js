@@ -1,4 +1,4 @@
- import { Circle, Popup } from "leaflet";
+ import { CircleMarker, Popup } from "leaflet";
 
  const casesTypeColors={
     cases: {
@@ -31,16 +31,17 @@ return sortedData
 //draw circles and tooltips
 export const ShowDataOnMap= (data, casesType="cases") =>
     data.map(country =>(
-        <Circle
+        <CircleMarker
         center={[country.countryInfo.lat, country.countryInfo.long]}
         fillOpacity={0.4}
         color={casesTypeColors[casesType].hex}
+        fillColor={casesTypeColors[casesType].hex}
         radius= {
             Math.sqrt(country[casesType]) * casesTypeColors[casesType].multiplier
         }    
         >
             <Popup>I am a pop up</Popup>
-        </Circle>
+        </CircleMarker>
     ))
 
 
